@@ -1,9 +1,11 @@
 import React, { useState } from "react";
+import './App.css'
 
 const App = () => {
   const [task, setTask] = useState([]);
   const [input, setInput] = useState("");
-  console.log(input);
+  const [editId,setEditId] = useState(null);
+  const [editbutton,setEditButton] = useState(false)
 
   const handleSubmit = () => {
     if (input.trim() === "") {
@@ -19,9 +21,23 @@ const App = () => {
 
     setInput("");
     setTask([...task, newTask]);
-    console.log(task);
+    
   };
-  console.log(task);
+
+  function handleEditFun(){
+
+    const result = task.map((tasks)=>{
+      if(tasks.id === editId ){
+        return {...tasks,task : input}
+      }
+      return tasks
+    })
+    setTask(result)
+    setEditButton(false)
+    setInput(" ")
+    setEditId(null)
+  }
+  
 
   const handleDelete = (id) => {
     console.log(id);
@@ -31,6 +47,16 @@ const App = () => {
     console.log(deleteTask);
     setTask(deleteTask);
   };
+
+  const handleEdit = (id) => {
+    console.log(id);
+    const editTask = task.find((tasks)=>tasks.id === id)
+    setEditId(id)
+    console.log(editTask.task);
+    setInput(editTask.task)
+    setEditButton(true)
+  };
+
 
   const handleUpdate = (id) => {
     const taskUpdate = task.map((item) => {
@@ -55,25 +81,31 @@ const App = () => {
           className=" h-10 rounded text-2xl border"
         />
         <button
-          className="bg-blue-500 text-white w-22 h-10 px-10 py-2 rounded"
-          onClick={handleSubmit}
+          className=" text-white w-22 h-10 px-10 py-2 rounded"
+          onClick={editbutton ? handleEditFun : handleSubmit}
+          className ={editId !==null ? "bg-pink-500 text-white w-22 h-10 px-10 py-2 rounded" 
+                                    : "bg-blue-500 text-white w-22 h-10 px-10 py-2 rounded"}
         >
-          Submit
+          {editId !==null ? "Edit" : "Sumbit"}
         </button>
       </section>
-      <section className=" w-full min-h-[66px]">
+      <section className="w-full flex justify-center">
+        <table className=" w-8/12 min-h-[66px] text-center  ">
+        <tbody>
         {task.map((item) => (
-          <div
+            
+              <tr className="grid grid-cols-[10%_70%_10%_10%] "
             key={item.id}
-            className="flex  items-center justify-center gap-10 h-15"
+            
           >
-            <input
+            <td><input
               type="checkbox"
               checked={item.status}
               onChange={() => handleUpdate(item.id)}
               className="w-5 h-5 accent-blue-500"
-            />
-            <p
+            /></td>
+            <td>
+              <p
               className="text-3xl "
               onClick={() => {
                 handleUpdate(item.id);
@@ -81,7 +113,19 @@ const App = () => {
             >
               {item.task}
             </p>
-            <button
+            </td>
+            <td>
+              <button
+              className="bg-pink-500 text-white w-22 h-10 px-10 py-2 rounded"
+              onClick={() => {
+                handleEdit(item.id);
+              }}
+            >
+              Edit
+            </button>
+            </td>
+            <td>
+              <button
               className="bg-orange-500 text-white w-22 h-10 px-10 py-2 rounded"
               onClick={() => {
                 handleDelete(item.id);
@@ -89,8 +133,13 @@ const App = () => {
             >
               Delete
             </button>
-          </div>
+            </td>
+          </tr>
+          
+        
         ))}
+        </tbody>
+      </table>
       </section>
     </div>
   );
